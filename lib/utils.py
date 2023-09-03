@@ -95,7 +95,7 @@ def pie_chart(df) :
     return fig
 
 
-def simulation_scenario(df, scenario, egalitaire=True):
+def simulation_scenario(df, scenario, equitable=True):
 
     """Calcul le surplus de recettes pour un scenario, et les  """
 
@@ -113,15 +113,21 @@ def simulation_scenario(df, scenario, egalitaire=True):
     df["nouveau_net"] = df["heritage_brut"] * (1 - df[scenario] / 100)
 
     # Mode de redistribution
-    if egalitaire :
+    if equitable :
         heritage_min = heritage_de_base(df, surplus)
         df["nouveau_net"] = np.maximum(df["nouveau_net"], heritage_min)
     else:
         # Egal
+        heritage_min = surplus
         df["nouveau_net"] += surplus
 
     # Diff entre ancien et nouvel héritage, à 5% prêt
     df["sign"] = df.apply(lambda row : compare(row["heritage"], row["nouveau_net"]), axis=1)
+
+    return df, surplus, heritage_min
+
+
+def detailed_graph(df, heritage_min, log_scale=True) :
 
     quantiles = np.insert(df.index.values, 0, [0])
     quantiles_str = []
@@ -162,8 +168,8 @@ def simulation_scenario(df, scenario, egalitaire=True):
             title='Part de la population',
             tickangle=-45),
         yaxis=dict(
-            type="log",
-            title='Héritage net € (log)',
+            type="log" if log_scale else "linear",
+            title='Héritage net €' + (" (log)" if log_scale else ""),
             titlefont_size=16,
             tickfont_size=14,
         ),
@@ -178,9 +184,9 @@ def simulation_scenario(df, scenario, egalitaire=True):
         # bargroupgap=0.1 # gap between bars of the same location coordinate.
     )
 
-    return df, fig, surplus, heritage_min
+    return fig
 
-def select_box(label, dict_values, default=None, radio=False) :
+def select_box(label, dict_values, default=None, radio=False, help=None) :
 
     if default is not None:
         index = list(dict_values.keys()).index(default)
@@ -194,7 +200,8 @@ def select_box(label, dict_values, default=None, radio=False) :
         label,
         dict_values.keys(),
         format_func=lambda key : dict_values[key],
-        index=index)
+        index=index,
+        help=help)
 
 
 def compare(before, after) :
@@ -211,11 +218,11 @@ def compare(before, after) :
 def compare_symbol(before, after) :
     sign = compare(before, after)
     if sign == -1 :
-        return "↘️"
+        return "😒"
     elif sign == 1 :
-        return "↗️"
+        return "😊"
     else:
-        return "≈"
+        return "😐"
 
 def format_amount(amount) :
     if amount < 1000:
@@ -228,7 +235,7 @@ def format_amount(amount) :
 def example_cases(df, heritage_min) :
     IDX_PAUVRE=0
     IDX_MOYEN=6
-    IDX_RICHE=13
+    IDX_RICHE=12
 
     net_before = df.heritage.values
     net_after = df.nouveau_net.values
