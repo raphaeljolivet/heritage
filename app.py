@@ -167,11 +167,16 @@ def section_results(df, scenario, mode, base):
     st.plotly_chart(pie, height=300)
 
     st.subheader("Détails")
-    st.markdown("Ce graphe montre, pour chaque tranche, l'héritage avant et après réforme.")
+    st.markdown(
+        """
+        Les graphes suivants montrent, pour chaque tranche, l'héritage avant et après réforme. 
+        
+        Le deuxième graphe est un 'zoom' sur les quantiles 0-90% peu lisibles du fait des fortes inégalités de l'héritage.""")
 
-    log_scale = st.toggle("échelle log", value=True)
+    detailed_fig = detailed_graph(df, heritage_min)
+    st.plotly_chart(detailed_fig)
 
-    detailed_fig = detailed_graph(df, heritage_min, log_scale=log_scale)
+    detailed_fig = detailed_graph(df, heritage_min, quant_max=90)
     st.plotly_chart(detailed_fig)
 
 def main():

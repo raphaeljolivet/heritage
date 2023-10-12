@@ -127,7 +127,10 @@ def simulation_scenario(df, scenario, equitable=True):
     return df, surplus, heritage_min
 
 
-def detailed_graph(df, heritage_min, log_scale=True) :
+def detailed_graph(df, heritage_min, quant_max=None) :
+
+    if quant_max :
+        df = df[df.index <= quant_max]
 
     quantiles = np.insert(df.index.values, 0, [0])
     quantiles_str = []
@@ -161,15 +164,16 @@ def detailed_graph(df, heritage_min, log_scale=True) :
                          marker_color='rgb(26, 118, 255)'
                          ))
 
+    title_prefix = "[Zoom 0-%d%%] " % (quant_max) if quant_max else ""
+
     fig.update_layout(
-        title='Héritage avant et après réforme de la fiscalité, pour chaque tranche',
+        title=title_prefix + 'Héritage avant et après réforme de la fiscalité, pour chaque tranche',
         xaxis_tickfont_size=14,
         xaxis=dict(
             title='Part de la population',
             tickangle=-45),
         yaxis=dict(
-            type="log" if log_scale else "linear",
-            title='Héritage net €' + (" (log)" if log_scale else ""),
+            title='Héritage net €',
             titlefont_size=16,
             tickfont_size=14,
         ),
