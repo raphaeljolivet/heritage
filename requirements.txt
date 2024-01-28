@@ -2,3 +2,5 @@ numpy==1.25.0
 pandas==2.0.3
 plotly==5.15.0
 streamlit==1.26.0
+jinja-markdown==1.200630
+staticjinja==5.0.0

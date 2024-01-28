@@ -1,5 +1,8 @@
+from contextlib import nullcontext
+
 import streamlit as st
-from lib.utils import load_data, simulation_scenario, select_box, example_cases, pie_chart, beneficaires, detailed_graph
+from lib.utils import load_data, simulation_scenario, select_box, pie_chart, beneficaires, \
+    detailed_graph, section_example_cases, detailed_graph_continuous
 from lib.tweaker import st_tweaker as stt
 
 
@@ -31,6 +34,23 @@ th {
     font-weight:700 !important;
     color:black !important;
 }
+
+.summary {
+  padding: 1em;
+    padding-top: 1em;
+    padding-right: 1em;
+    padding-bottom: 1em;
+    padding-left: 1em;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  border-radius: 5px;
+
+  background-color:#ffe86f;
+}
+
+.summary p {
+    font-size:1.3rem;
+}
+
 """
 
 ASSIETTES_BAREMES  = {
@@ -59,7 +79,7 @@ VOLUME_TOTAL = 300 * 10 **9 # 300 Milliards
 def title(label):
     stt.title(label, cls="title")
 
-def section_params():
+def section_params(columns=True):
     """ Display and get parameters """
     title("Paramètres")
 
@@ -67,7 +87,8 @@ def section_params():
         Modifiez les paramètres et observez l'impact sur les résultats dans la section suivante. 
     """)
 
-    param_col1, param_col2, param_col3 = st.columns(3)
+
+    param_col1, param_col2, param_col3 = st.columns(3) if columns else [nullcontext()] * 3
 
     with param_col1 :
         help = """
@@ -144,22 +165,26 @@ def section_results(df, scenario, mode, base):
             "% de population gagnante", "%d %%" % (nb_benef + nb_neutres),
             cls="metric-heritage-pct")
 
-    stt.markdown(
-        "Ce scenario génère un :green[surplus de recette fiscales de **%d milliards €**], qui permettrait de financer un héritage de base de :blue[**%d 000 €**]. "
-        "Il profiterait à :green[**%d %% de la population**]." %
-                (surplus_brut / (10**9), heritage_min/1000, nb_benef + nb_neutres))
+    stt.markdown("""
+        Ce scenario génère un :red[surplus de recette fiscales de **%d milliards €**].
+        
+         Il permettrait de financer un :blue[**héritage de base** **%d 000 €**].
+         
+         Il profiterait à :green[**%d %% de la population**].""" % (surplus_brut / (10**9), heritage_min/1000, nb_benef + nb_neutres),
 
-    st.subheader("Cas d'exemple")
+        cls="summary")
 
-    st.markdown("Voici quelques cas d'exemples d'héritage avant/après une réforme de la fiscalité : ")
+    # Cas d'exemples
+    section_example_cases(df, heritage_min)
 
-    examples_df = example_cases(df, heritage_min)
-    st.table(examples_df)
 
     st.subheader("Bénéficiaires")
-    st.markdown(
-        "Ce graphe présente les parts de population qui seraient **gagnants**, **perdants** ou **neutres** par l'application d'une telle réforme."
-        "Notons que mêmes les tranches 'neutres' en terme d'héritage net reçu, bénéficieraient d'un **héritage précoce** de la part minimale socialisée.")
+    st.markdown("""
+    Ce graphe présente les parts de population qui seraient :
+    * **Gagnants** : héritage plus important 
+    * **Neutres** : héritage similaire, mais plus précoce (25 ans contre 50 ans en moyenne)
+    * **Perdants** : héritage moindre
+    """)
 
 
     pie = pie_chart(df)
@@ -178,6 +203,8 @@ def section_results(df, scenario, mode, base):
 
     detailed_fig = detailed_graph(df, heritage_min, quant_max=90)
     st.plotly_chart(detailed_fig)
+
+    st.plotly_chart(detailed_graph_continuous(df, heritage_min))
 
 def main():
 
@@ -210,7 +237,8 @@ def main():
     # Base des tranche statistiques
     base = VOLUME_TOTAL / df.volumes.sum()
 
-    scenario, mode = section_params()
+    with st.sidebar :
+        scenario, mode = section_params(columns=False)
 
     section_results(df=df, scenario=scenario, mode=mode, base=base)
 

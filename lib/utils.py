@@ -89,7 +89,7 @@ def pie_chart(df) :
 
     fig = px.pie(
         values=values,
-        names=["Gagnants", "Neutres (héritage + précoce)", "Perdants"],
+        names=["Héritage + important", "Héritage identique et + précoce", "Héritage moindre"],
         color_discrete_sequence=["green", "blue", "orange"])
     fig.update_traces(sort=False)
     return fig
@@ -150,18 +150,21 @@ def detailed_graph(df, heritage_min, quant_max=None) :
                              name='Héritage de base (%d k€)' % (heritage_min / 1000),
                              line_color='red',
                              mode='lines',
-                             line_dash='dash'
+                             line_dash='dash',
                              ))
 
     fig.add_trace(go.Bar(x=quantiles_str,
                          y=df.heritage,
                          name='Avant réforme',
-                         marker_color='rgb(55, 83, 109)'
+                         marker_color='orange',
+                         marker={"line": {"width": 2, "color": "orange"}}
                          ))
+
     fig.add_trace(go.Bar(x=quantiles_str,
                          y=df.nouveau_net,
                          name='Après réforme',
-                         marker_color='rgb(26, 118, 255)'
+                         marker_color='green',
+                         marker = {"line": {"width": 2, "color": "green"}}
                          ))
 
     title_prefix = "[Zoom 0-%d%%] " % (quant_max) if quant_max else ""
@@ -186,6 +189,54 @@ def detailed_graph(df, heritage_min, quant_max=None) :
         barmode='group',
         # bargap=0.15, # gap between bars of adjacent location coordinates.
         # bargroupgap=0.1 # gap between bars of the same location coordinate.
+    )
+
+    return fig
+
+def detailed_graph_continuous(df, heritage_min) :
+
+    quantiles = np.insert(df.index.values, 0, [0])
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=quantiles,
+                             y=[heritage_min] * len(quantiles),
+                             name='Héritage de base (%d k€)' % (heritage_min / 1000),
+                             line_color='red',
+                             mode='lines',
+                             line_dash='dash'
+                             ))
+
+    fig.add_trace(go.Scatter(x=quantiles,
+                         y=df.heritage,
+                         mode='lines',
+                         name='Avant réforme',
+                         line_color='rgb(55, 83, 109)'
+                         ))
+    fig.add_trace(go.Scatter(x=quantiles,
+                         y=df.nouveau_net,
+                         name='Après réforme',
+                         mode='lines',
+                         line_color='rgb(26, 118, 255)'
+                         ))
+
+    fig.update_layout(
+        title='Héritage avant et après réforme de la fiscalité, pour chaque tranche',
+        xaxis_tickfont_size=14,
+        xaxis=dict(
+            title='Part de la population'),
+        yaxis=dict(
+            title='Héritage net €',
+            type='log',
+            titlefont_size=16,
+            tickfont_size=14,
+        ),
+        legend=dict(
+            x=0,
+            y=1.0,
+            bgcolor='rgba(255, 255, 255, 0)',
+            bordercolor='rgba(255, 255, 255, 0)'
+        ),
     )
 
     return fig
@@ -219,14 +270,14 @@ def compare(before, after) :
     else :
        return 0
 
-def compare_symbol(before, after) :
+def compare_symbol(before, after, neutral_symbol="😐") :
     sign = compare(before, after)
     if sign == -1 :
         return "😒"
     elif sign == 1 :
         return "😊"
     else:
-        return "😐"
+        return neutral_symbol
 
 def format_amount(amount) :
     if amount < 1000:
@@ -236,7 +287,8 @@ def format_amount(amount) :
     else:
         return "%d M€" % (amount / 10**6)
 
-def example_cases(df, heritage_min) :
+def section_example_cases(df, heritage_min) :
+
     IDX_PAUVRE=0
     IDX_MOYEN=6
     IDX_RICHE=12
@@ -250,16 +302,25 @@ def example_cases(df, heritage_min) :
     for idx in [IDX_PAUVRE, IDX_MOYEN, IDX_RICHE] :
         before_amount = net_before[idx]
         after_amount = net_after[idx]
-        symbol = compare_symbol(before_amount, after_amount)
+        symbol = compare_symbol(
+            before_amount,
+            after_amount,
+            neutral_symbol="😊")
 
         before_labels.append(
-            format_amount(before_amount))
+            format_amount(before_amount) + (" ( à 50 ans 👴🏻)" if before_amount > 1000 else ""))
+
         after_labels.append(
-            symbol + " " + format_amount(after_amount)
+            symbol + " " + format_amount(after_amount) + f" (dont {int(heritage_min/1000)} k€ à 25 ans)"
         )
 
-    return pd.DataFrame({
+    df = pd.DataFrame({
             "Profil": ["Aucun héritage ", "Héritage moyen 💰", "Gros héritage 💰💰💰"],
             "Avant réforme": before_labels,
-        ("Après réforme (dont %d k€ à 25 ans)" % (heritage_min / 1000)): after_labels,
+            "Après réforme": after_labels,
         }).set_index("Profil")
+
+    st.subheader("Cas d'exemple")
+    st.markdown("Voici quelques cas d'exemples d'héritage avant/après une réforme de la fiscalité : ")
+
+    st.table(df)
