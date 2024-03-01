@@ -302,5 +302,15 @@ h2 {
 
 iframe {
   width:100%;
-  height:1000px;
+  height:4000px;
+}
+
+.fa-brands {
+  color:black!important;
+  text-decoration: none !important;
+  padding-left: 0.5em;
+}
+
+.footer .fa-brands {
+  color: white !important;
 }
