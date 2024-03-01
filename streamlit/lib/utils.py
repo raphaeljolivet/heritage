@@ -97,7 +97,7 @@ def pie_chart(df) :
 
 def simulation_scenario(df, scenario, equitable=True):
 
-    """Calcul le surplus de recettes pour un scenario, et les  """
+    """Calcul le surplus de recettes pour un scenario """
 
     df = df.copy()
 
@@ -126,11 +126,43 @@ def simulation_scenario(df, scenario, equitable=True):
 
     return df, surplus, heritage_min
 
+def rates_graph(df, scenario) :
 
-def detailed_graph(df, heritage_min, quant_max=None) :
+    fig = go.Figure()
 
-    if quant_max :
-        df = df[df.index <= quant_max]
+
+
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["actuel"],
+        name='Avant réforme',
+        mode='lines',
+        marker_color='orange',
+        marker={"line": {"width": 2, "color": "orange"}}
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df[scenario],
+        name='Après réforme',
+        mode='lines',
+        marker_color='green',
+        marker={"line": {"width": 2, "color": "green"}}
+    ))
+
+    fig.update_layout(
+        title="Taux d'imposition par héritage",
+        xaxis=dict(title='Part de la population (%)'),
+        yaxis=dict(
+            title="Taux d'imposition (%)",
+            titlefont_size=16,
+            tickfont_size=14,
+        )
+    )
+
+    return fig
+
+def _compute_quantiles_str(df):
 
     quantiles = np.insert(df.index.values, 0, [0])
     quantiles_str = []
@@ -142,11 +174,19 @@ def detailed_graph(df, heritage_min, quant_max=None) :
             quantiles_str.append("%d-%d %%" % (quant, quant2))
         else:
             quantiles_str.append(">%0.1f %%" % (100 - quant))
+    return quantiles_str
+
+def detailed_graph(df, heritage_min, quant_max=None) :
+
+    if quant_max :
+        df = df[df.index <= quant_max]
+
+    quantiles_str = _compute_quantiles_str(df)
 
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(x=quantiles_str,
-                             y=[heritage_min] * len(quantiles),
+                             y=[heritage_min] * len(quantiles_str),
                              name='Héritage de base (%d k€)' % (heritage_min / 1000),
                              line_color='red',
                              mode='lines',
@@ -193,9 +233,75 @@ def detailed_graph(df, heritage_min, quant_max=None) :
 
     return fig
 
+def detailed_graph_splitted(df) :
+
+    quantiles = np.insert(df.index.values, 0, [0])
+    #quantiles_str = []
+    #for i, quant in enumerate(quantiles):
+    #    if i >= len(df):
+    #        break
+    #    if quant < 99:
+    #        quant2 = quantiles[i + 1]
+    #        quantiles_str.append("%d-%d %%" % (quant, quant2))
+    #    else:
+    #        quantiles_str.append(">%0.1f %%" % (100 - quant))
+
+    #fig = make_subplots(rows=2, cols=1, vertical_spacing = 0.04)
+    fig = go.Figure()
+
+    """
+    fig.add_trace(go.Scatter(
+            x=quantiles,
+            y=df.heritage,
+            name='Héritage',
+            marker_color='orange',
+            marker={"line": {"width": 2, "color": "orange"}}),
+        row=2, col=1)"""
+
+    fig.add_trace(go.Scatter(
+        x=quantiles/100,
+        y=df.heritage,
+        name='Héritage',
+        marker_color='orange',
+        marker={"line": {"width": 2, "color": "orange"}}))
+
+    fig.update_layout(
+        xaxis_tickfont_size=14,
+        xaxis=dict(
+            title='Part de la population',
+            tickformat=".0%",
+        ),
+        yaxis=dict(
+            title='Héritage net € (log)',
+            titlefont_size=16,
+            tickfont_size=14,
+            type="log",
+        ),
+        legend=dict(
+            x=0,
+            y=1.0,
+            bgcolor='rgba(255, 255, 255, 0)',
+            bordercolor='rgba(255, 255, 255, 0)'
+        ),
+        barmode='group',
+        # bargap=0.15, # gap between bars of adjacent location coordinates.
+        # bargroupgap=0.1 # gap between bars of the same location coordinate.
+    )
+
+    #fig.update_yaxes(range=[CUT_INTERVAL[1], df.heritage.max() * 1.1], row=1, col=1)
+    #fig.update_xaxes(visible=False, row=1, col=1)
+    #fig.update_yaxes(range=[0, CUT_INTERVAL[0]], row=2, col=1)
+
+    return fig
+
+
 def detailed_graph_continuous(df, heritage_min) :
 
     quantiles = np.insert(df.index.values, 0, [0])
+
+    quant_width = np.array([quantiles[i+1]-quantiles[i] for i in range(0, len(quantiles)-1)])
+
+    volumes = df.heritage * quant_width
 
     fig = go.Figure()
 
@@ -208,16 +314,10 @@ def detailed_graph_continuous(df, heritage_min) :
                              ))
 
     fig.add_trace(go.Scatter(x=quantiles,
-                         y=df.heritage,
+                         y=volumes,
                          mode='lines',
                          name='Avant réforme',
                          line_color='rgb(55, 83, 109)'
-                         ))
-    fig.add_trace(go.Scatter(x=quantiles,
-                         y=df.nouveau_net,
-                         name='Après réforme',
-                         mode='lines',
-                         line_color='rgb(26, 118, 255)'
                          ))
 
     fig.update_layout(
@@ -227,7 +327,7 @@ def detailed_graph_continuous(df, heritage_min) :
             title='Part de la population'),
         yaxis=dict(
             title='Héritage net €',
-            type='log',
+            #type='log',
             titlefont_size=16,
             tickfont_size=14,
         ),

@@ -1,43 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Héritage pour tous</title>
-    <meta name="description" content="Réformer l'héritage au bénéfice de la majorité des français">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="./css/pure-min.css" >
-    <link rel="stylesheet" href="./css/grid-min.css" >
-    <link rel="stylesheet" href="./css/styles.css" >
-
-</head>
-<body>
-
-
-<div class="banner">
-    <div class="banner-head">
-        <h1 class="banner-title">l'Héritage Pour Tous</h1>
-        <p class="banner-subtitle">Réformer l'héritage pour <b>réduire les inégalités</b>,<br/> instaurer un <b>héritage de base</b>, au profit de la <b>majorité des français</b></p>
-
-        <div class="pure-menu pure-menu-horizontal">
-        <ul class="pure-menu-list" >
-            <li class="pure-menu-item">
-                <a href="https://simulateur.heritage-pour-tous.fr" class="pure-menu-link">📊 Simulateur</a>
-            </li>
-            <li class="pure-menu-item">
-                <a href="./about" class="pure-menu-link">📧 à propos / contact</a>
-            </li>
-        </ul>
-    </div>
-    </div>
-
-
-
-</div>
-
-<div class="l-content">
+{% extends "_layout/base.html" %}
+    {%  block content %}
 
     <h2>Introduction</h2>
 
@@ -45,7 +7,7 @@
         {% markdown %}
             Ce site reprend [l'idée de Thomas Picketty](https://www.ladepeche.fr/2019/12/30/un-heritage-de-120-000-euros-pour-tous-a-25-ans-lidee-insolite-de-leconomiste-thomas-piketty,8633337.php) d'un **héritage pour tous à 25 ans**.
 
-            Il propose un [simulateur de réforme](https://simulateur.heritage-pour-tous.fr) qui s'appuie sur le rapport [*Repenser l'héritage*](https://www.cae-eco.fr/repenser-lheritage), du [Conseil d'Analyse Économique (CAE)](https://www.cae-eco.fr/) qui **démontre la faisabilité d'un tel projet**.
+            Il propose un [simulateur de réforme](/simulateur) qui s'appuie sur le rapport [*Repenser l'héritage*](https://www.cae-eco.fr/repenser-lheritage), du [Conseil d'Analyse Économique (CAE)](https://www.cae-eco.fr/) qui **démontre la faisabilité d'un tel projet**.
 
             L'objectif est **d'ouvrir un débat public** sur ce thème et d'inciter les **partis politiques à s'en emparer**.
 
@@ -71,9 +33,7 @@
                     {% endmarkdown %}
                 </p>
             </div>
-        </div>
 
-        <div class="pure-u-1 pure-u-md-1-2">
             <div class="c-box">
                 <h3 class="information-head">
                     <i class="fa-solid fa-scale-unbalanced"></i>
@@ -86,7 +46,8 @@
                     * 50% des français héritent de **moins de 70 000 €**
                     * 0.1% des plus riches héritent de **13 millions d'euros**
 
-                    Si l'héritage était totalement égalitaire, chaque français [hériterait de 370 000 €](https://www.pourleco.com/idees/economistes-qui-pense-quoi-sur-lheritage-et-limpot-sur-les-successions)
+                    ![](./img/repartition.png)
+
                     {% endmarkdown %}
                 </p>
             </div>
@@ -110,6 +71,19 @@
                     {% endmarkdown %}
                 </p>
             </div>
+
+            <div class="c-box">
+                <h3 class="information-head">
+                    ❓ Le saviez-vous ?
+                </h3>
+                <p>
+                    {% markdown %}
+
+                    Si l'héritage était totalement égalitaire, chaque français [hériterait de 370 000 €](https://www.pourleco.com/idees/economistes-qui-pense-quoi-sur-lheritage-et-limpot-sur-les-successions)
+
+                    {% endmarkdown %}
+                </p>
+            </div>
         </div>
 
    </div> <!-- end information -->
@@ -127,13 +101,13 @@
 
           Une telle réforme serait bénéfique pour plus de **95% des français**.
 
-          Voici un exemple de résultat [du simulateur](https://simulateur.heritage-pour-tous.fr) :
+          Voici un exemple de résultat [du simulateur](/simulateur) :
 
           ![](./img/exemple-tableau.png)
 
          {% endmarkdown %}
 
-        <a class="pure-button pure-button-primary " href="https://simulateur.heritage-pour-tous.fr">Tester le simulateur</a>
+        <a class="pure-button pure-button-primary " href="/simulateur">Tester le simulateur</a>
 
 
         </div>
@@ -141,24 +115,14 @@
      <h2>Resources / aller plus loin</h2>
 
     <div  class="introduction">
-       {% markdown %}
-       * [L'étude du CAE : "Repenser l'héritage"](https://www.cae-eco.fr/repenser-lheritage")
-       * [Thomas Piketty: «La solution la plus simple pour diffuser la richesse est l’héritage pour tous» [Le Monde]](https://www.lemonde.fr/idees/article/2021/05/15/thomas-piketty-l-heritage-pour-tous-vise-a-accroitre-le-pouvoir-de-negociation-de-ceux-qui-ne-possedent-rien_6080270_3232.html)
-       * ["Peut on éviter une société d'héritiers" France Stratégie](https://www.strategie.gouv.fr/publications/eviter-une-societe-dheritiers)
-       * [Repensons l'héritage.eu : site et simulateur de Emile Maras](https://repensonslheritage.eu/accueil)
-       * [[vidéo] Conférence gesticulée de Emile Maras](https://www.youtube.com/watch?v=DC1DL7cRGco)
-       {%  endmarkdown %}
+        {%  for link in links %}
+            <a class="c-box" href="{{ link.url }}">
+                {{ link.title }}<br/>
+                <b>{{ link.url | domain }}</b>
+            </a>
+        {%  endfor %}
     </div>
 
+{% endblock %}
 
 
-</div>
-
-<div class="footer l-box">
-    <p>
-        <a href="#">Contact</a>
-    </p>
-</div>
-
-</body>
-</html>

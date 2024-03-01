@@ -1,0 +1,14 @@
+services:
+  streamlit:
+    build: ./streamlit
+    volumes:
+        -  ./streamlit:/app
+
+  nginx:
+    build: ./nginx/
+    depends_on:
+      - streamlit
+    ports:
+      - "8001:80"
+    volumes:
+      - ./www/dist:/var/www/html/public

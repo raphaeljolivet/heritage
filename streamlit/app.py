@@ -2,7 +2,7 @@ from contextlib import nullcontext
 
 import streamlit as st
 from lib.utils import load_data, simulation_scenario, select_box, pie_chart, beneficaires, \
-    detailed_graph, section_example_cases, detailed_graph_continuous
+    detailed_graph, section_example_cases, detailed_graph_continuous, detailed_graph_splitted, rates_graph
 from lib.tweaker import st_tweaker as stt
 
 
@@ -51,6 +51,14 @@ th {
     font-size:1.3rem;
 }
 
+.block-container {
+    padding-top:1em !important;
+}
+
+header {
+    display: none !important;
+}
+
 """
 
 ASSIETTES_BAREMES  = {
@@ -81,7 +89,6 @@ def title(label):
 
 def section_params(columns=True):
     """ Display and get parameters """
-    title("Paramètres")
 
     st.markdown("""
         Modifiez les paramètres et observez l'impact sur les résultats dans la section suivante. 
@@ -191,7 +198,7 @@ def section_results(df, scenario, mode, base):
     pie.update_layout(height=300)
     st.plotly_chart(pie, height=300)
 
-    st.subheader("Détails")
+    st.subheader("Détail")
     st.markdown(
         """
         Les graphes suivants montrent, pour chaque tranche, l'héritage avant et après réforme. 
@@ -204,7 +211,11 @@ def section_results(df, scenario, mode, base):
     detailed_fig = detailed_graph(df, heritage_min, quant_max=90)
     st.plotly_chart(detailed_fig)
 
-    st.plotly_chart(detailed_graph_continuous(df, heritage_min))
+    #st.subheader("Taux d'imposition")
+    #st.plotly_chart(rates_graph(df, scenario))
+
+
+    #st.plotly_chart(detailed_graph_splitted(df))
 
 def main():
 
@@ -215,6 +226,7 @@ def main():
 
     # Load static CSS
     st.markdown(f"<style>{STYLE}</style>", unsafe_allow_html=True)
+
 
     title("l'Héritage pour tous : simulateur fiscal")
 
@@ -237,7 +249,9 @@ def main():
     # Base des tranche statistiques
     base = VOLUME_TOTAL / df.volumes.sum()
 
-    with st.sidebar :
+    title("Paramètres")
+
+    with st.expander("Cliquez pour afficher les paramètres ⏬") :
         scenario, mode = section_params(columns=False)
 
     section_results(df=df, scenario=scenario, mode=mode, base=base)
