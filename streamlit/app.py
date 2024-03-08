@@ -221,22 +221,22 @@ def main():
 
     # Setup app details
     st.set_page_config(
-        page_title='Simulateur - Héritage pour tous',
+        page_title='Simulateur - Héritage pour tous et toutes',
         page_icon="👴")
 
     # Load static CSS
     st.markdown(f"<style>{STYLE}</style>", unsafe_allow_html=True)
 
 
-    title("l'Héritage pour tous : simulateur fiscal")
+    #title("l'Héritage pour tous : simulateur fiscal")
 
     st.markdown("""
 
       Ce simulateur reprend l'idée de [l'héritage pour tous de Thomas Picketty](https://www.lemonde.fr/idees/article/2021/05/15/thomas-piketty-l-heritage-pour-tous-vise-a-accroitre-le-pouvoir-de-negociation-de-ceux-qui-ne-possedent-rien_6080270_3232.html) 
      et se base sur les travaux du *Conseil d'Analyse économique* (CAE) : [Repenser l'héritage](https://www.cae-eco.fr/repenser-lheritage).
     
-      En réformant la fiscalité sur l'héritage, il est possible de faire un impôt **réellement progressif**, qui **bénéfice à la majorité des français** (jusqu'à 99%), 
-     tout en dégageant un **surplus de recettes fiscales** permettant de financer un **héritage minimal socialisé**, versé à tout citoyen au **début de sa vie active** 
+      En réformant la fiscalité sur l'héritage, il est possible de faire un impôt **réellement progressif**, qui **bénéfice à la majorité des français.es** (jusqu'à 99%), 
+     tout en dégageant un **surplus de recettes fiscales** permettant de financer un **héritage minimal socialisé**, versé à tout·e citoyen·ne au **début de sa vie active** 
      (25 ans par exemple, contre 50 ans en moyenne actuellement).    
     
       L'objectif de ce simulateur est donc de mettre en valeur le travail du CAE qui a démontré la faisabilité d'un tel projet, et d'ouvrir le débat public sur ce sujet.   

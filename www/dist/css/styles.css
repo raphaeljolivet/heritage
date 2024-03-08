@@ -241,6 +241,16 @@ p {
 
 }
 
+
+
+@media (max-width: 767px) {
+  .inner-banner {
+    padding: 0.2em !important;
+    font-size: 70%;
+    max-width: 100%;
+  }
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -286,7 +296,7 @@ p img {
 }
 
 .logo {
-  max-height: 300px;
+  max-height: 200px;
 }
 
 
@@ -313,4 +323,10 @@ iframe {
 
 .footer .fa-brands {
   color: white !important;
+}
+
+.menu-item {
+  font-size: 0.8em;
+  background-color: #c5c5c5;
+  margin-left: 1em;
 }
